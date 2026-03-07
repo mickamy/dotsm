@@ -1,0 +1,47 @@
+version: 2
+
+release:
+  mode: replace
+
+builds:
+  - id: dotsm
+    main: .
+    binary: dotsm
+    ldflags:
+      - -X main.version={{.Version}}
+    goos:
+      - darwin
+      - linux
+    goarch:
+      - amd64
+      - arm64
+
+archives:
+  - ids:
+      - dotsm
+    formats:
+      - tar.gz
+    name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+
+brews:
+  - name: dotsm
+    homepage: https://github.com/mickamy/dotsm
+    description: Sync AWS Secrets Manager secrets with .env files — pull, push, and diff in a single binary.
+    install: |
+      bin.install "dotsm"
+    repository:
+      owner: mickamy
+      name: homebrew-tap
+      token: "{{ .Env.TAP_GITHUB_TOKEN }}"
+
+nix:
+  - name: dotsm
+    homepage: https://github.com/mickamy/dotsm
+    description: Sync AWS Secrets Manager secrets with .env files — pull, push, and diff in a single binary.
+    license: mit
+    repository:
+      owner: mickamy
+      name: nur-packages
+      token: "{{ .Env.TAP_GITHUB_TOKEN }}"
+
+changelog: { }
