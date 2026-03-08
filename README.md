@@ -58,10 +58,11 @@ Output:
 ```
 + NEW_KEY          # in local, not in remote
 - REMOVED_KEY      # in remote, not in local
-~ CHANGED_KEY: "old" → "new"
+~ CHANGED_KEY (changed)
 ```
 
 Exits with code 1 if differences are found — useful in CI.
+Secret values are masked by default. Use `-show-values` to reveal them.
 
 ## Common Options
 
@@ -70,6 +71,19 @@ Exits with code 1 if differences are found — useful in CI.
 | `-secret`  | Secret ID in Secrets Manager (required) |
 | `-region`  | AWS region (overrides default)          |
 | `-profile` | AWS CLI profile                         |
+
+## Prerequisites
+
+The `push` command updates an **existing** secret. Create the secret beforehand (e.g., via Terraform/OpenTofu or AWS CLI):
+
+```bash
+aws secretsmanager create-secret --name myapp-prod/app --secret-string '{}'
+```
+
+## Limitations
+
+- Multiline values are escaped as `\n` / `\r` in `.env` output. Raw multiline `.env` syntax is not supported.
+- Secrets must be JSON objects with string values (`{"KEY": "value"}`).
 
 ## AWS Authentication
 
