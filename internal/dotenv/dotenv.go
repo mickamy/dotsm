@@ -15,6 +15,8 @@ import (
 func Parse(r io.Reader) (map[string]string, error) {
 	result := make(map[string]string)
 	scanner := bufio.NewScanner(r)
+	buf := make([]byte, 64*1024)
+	scanner.Buffer(buf, 1024*1024)
 	lineNum := 0
 
 	for scanner.Scan() {
