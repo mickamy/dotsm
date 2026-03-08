@@ -73,11 +73,7 @@ func Marshal(w io.Writer, kvs map[string]string) error {
 func unquote(s string) string {
 	if len(s) >= 2 {
 		if s[0] == '"' && s[len(s)-1] == '"' {
-			inner := s[1 : len(s)-1]
-			inner = strings.ReplaceAll(inner, `\"`, `"`)
-			inner = strings.ReplaceAll(inner, `\n`, "\n")
-			inner = strings.ReplaceAll(inner, `\r`, "\r")
-			return inner
+			return unescapeDouble(s[1 : len(s)-1])
 		}
 		if s[0] == '\'' && s[len(s)-1] == '\'' {
 			return s[1 : len(s)-1]
@@ -86,9 +82,40 @@ func unquote(s string) string {
 	return s
 }
 
+// unescapeDouble performs a single-pass unescape of a double-quoted value.
+// Recognized sequences: \\, \", \n, \r. Unknown sequences are preserved literally.
+func unescapeDouble(s string) string {
+	var b strings.Builder
+	b.Grow(len(s))
+	for i := 0; i < len(s); i++ {
+		c := s[i]
+		if c == '\\' && i+1 < len(s) {
+			next := s[i+1]
+			switch next {
+			case '\\':
+				b.WriteByte('\\')
+			case '"':
+				b.WriteByte('"')
+			case 'n':
+				b.WriteByte('\n')
+			case 'r':
+				b.WriteByte('\r')
+			default:
+				b.WriteByte('\\')
+				b.WriteByte(next)
+			}
+			i++
+			continue
+		}
+		b.WriteByte(c)
+	}
+	return b.String()
+}
+
 func quote(s string) string {
-	if strings.ContainsAny(s, " \t\n\r\"'#") {
+	if strings.ContainsAny(s, " \t\n\r\"'#\\") {
 		r := strings.NewReplacer(
+			`\`, `\\`,
 			`"`, `\"`,
 			"\n", `\n`,
 			"\r", `\r`,

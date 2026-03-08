@@ -163,12 +163,14 @@ func TestRoundTrip(t *testing.T) {
 	t.Parallel()
 
 	original := map[string]string{
-		"DB_HOST":     "localhost",
-		"DB_PASSWORD": "s3cret",
-		"APP_NAME":    "my app",
-		"QUOTED":      `say "hello"`,
-		"MULTILINE":   "line1\nline2\nline3",
-		"WITH_CR":     "a\r\nb",
+		"DB_HOST":      "localhost",
+		"DB_PASSWORD":  "s3cret",
+		"APP_NAME":     "my app",
+		"QUOTED":       `say "hello"`,
+		"MULTILINE":    "line1\nline2\nline3",
+		"WITH_CR":      "a\r\nb",
+		"BACKSLASH":    `C:\new\folder`,
+		"LITERAL_BS_N": `foo\nbar`,
 	}
 
 	var buf bytes.Buffer
