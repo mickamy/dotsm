@@ -1,3 +1,4 @@
+//nolint:gosec // test data and temp file paths
 package cmd_test
 
 import (
