@@ -1,11 +1,10 @@
 package cmd
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"os"
-
-	"context"
 
 	"github.com/mickamy/dotsm/internal/dotenv"
 	"github.com/mickamy/dotsm/internal/sm"
