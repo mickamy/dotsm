@@ -98,6 +98,9 @@ func TestClient_Get(t *testing.T) {
 				t.Fatalf("unexpected error: %v", err)
 			}
 
+			if len(got) != len(tt.want) {
+				t.Fatalf("key count: got %d, want %d", len(got), len(tt.want))
+			}
 			for k, wantV := range tt.want {
 				gotV, ok := got[k]
 				if !ok {
