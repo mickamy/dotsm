@@ -27,7 +27,7 @@ func Pull(ctx context.Context, client *sm.Client, opts PullOptions) error {
 	if opts.Output == "" || opts.Output == "-" {
 		w = os.Stdout
 	} else {
-		f, err := os.Create(opts.Output)
+		f, err := os.OpenFile(opts.Output, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
 		if err != nil {
 			return fmt.Errorf("create %q: %w", opts.Output, err)
 		}
