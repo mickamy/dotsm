@@ -74,7 +74,10 @@ func unquote(s string) string {
 	if len(s) >= 2 {
 		if s[0] == '"' && s[len(s)-1] == '"' {
 			inner := s[1 : len(s)-1]
-			return strings.ReplaceAll(inner, `\"`, `"`)
+			inner = strings.ReplaceAll(inner, `\"`, `"`)
+			inner = strings.ReplaceAll(inner, `\n`, "\n")
+			inner = strings.ReplaceAll(inner, `\r`, "\r")
+			return inner
 		}
 		if s[0] == '\'' && s[len(s)-1] == '\'' {
 			return s[1 : len(s)-1]
@@ -84,8 +87,13 @@ func unquote(s string) string {
 }
 
 func quote(s string) string {
-	if strings.ContainsAny(s, " \t\"'#") {
-		return `"` + strings.ReplaceAll(s, `"`, `\"`) + `"`
+	if strings.ContainsAny(s, " \t\n\r\"'#") {
+		r := strings.NewReplacer(
+			`"`, `\"`,
+			"\n", `\n`,
+			"\r", `\r`,
+		)
+		return `"` + r.Replace(s) + `"`
 	}
 	return s
 }

@@ -167,6 +167,8 @@ func TestRoundTrip(t *testing.T) {
 		"DB_PASSWORD": "s3cret",
 		"APP_NAME":    "my app",
 		"QUOTED":      `say "hello"`,
+		"MULTILINE":   "line1\nline2\nline3",
+		"WITH_CR":     "a\r\nb",
 	}
 
 	var buf bytes.Buffer
