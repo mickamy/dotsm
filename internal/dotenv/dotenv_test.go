@@ -147,6 +147,18 @@ func TestMarshal(t *testing.T) {
 	}
 }
 
+func TestParse_UnescapeDoubleQuote(t *testing.T) {
+	t.Parallel()
+
+	got, err := dotenv.Parse(strings.NewReader(`FOO="say \"hi\""` + "\n"))
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if got["FOO"] != `say "hi"` {
+		t.Errorf("got %q, want %q", got["FOO"], `say "hi"`)
+	}
+}
+
 func TestRoundTrip(t *testing.T) {
 	t.Parallel()
 
@@ -154,6 +166,7 @@ func TestRoundTrip(t *testing.T) {
 		"DB_HOST":     "localhost",
 		"DB_PASSWORD": "s3cret",
 		"APP_NAME":    "my app",
+		"QUOTED":      `say "hello"`,
 	}
 
 	var buf bytes.Buffer
