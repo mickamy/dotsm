@@ -32,6 +32,9 @@ func Pull(ctx context.Context, client *sm.Client, opts PullOptions) error {
 			return fmt.Errorf("create %q: %w", opts.Output, err)
 		}
 		defer func() { _ = f.Close() }()
+		if err := f.Chmod(0600); err != nil {
+			return fmt.Errorf("chmod %q: %w", opts.Output, err)
+		}
 		w = f
 	}
 
