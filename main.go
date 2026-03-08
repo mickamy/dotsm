@@ -47,7 +47,7 @@ func main() {
 	case "version":
 		fmt.Println("dotsm", version)
 	case "-h", "--help", "help":
-		fmt.Fprint(os.Stderr, usage)
+		fmt.Fprint(os.Stdout, usage)
 	default:
 		fmt.Fprintf(os.Stderr, "unknown command: %s\n\n", subcmd)
 		fmt.Fprint(os.Stderr, usage)
