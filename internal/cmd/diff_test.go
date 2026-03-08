@@ -83,9 +83,10 @@ func TestPrintDiff(t *testing.T) {
 	t.Parallel()
 
 	tests := []struct {
-		name   string
-		result *cmd.DiffResult
-		want   string
+		name       string
+		result     *cmd.DiffResult
+		showValues bool
+		want       string
 	}{
 		{
 			name:   "no diff",
@@ -93,13 +94,24 @@ func TestPrintDiff(t *testing.T) {
 			want:   "No differences.\n",
 		},
 		{
-			name: "all types",
+			name: "masked by default",
 			result: &cmd.DiffResult{
 				Added:   []string{"NEW_KEY"},
 				Removed: []string{"OLD_KEY"},
 				Changed: map[string][2]string{"MOD_KEY": {"old", "new"}},
 			},
-			want: "+ NEW_KEY\n- OLD_KEY\n~ MOD_KEY: \"old\" → \"new\"\n",
+			showValues: false,
+			want:       "+ NEW_KEY\n- OLD_KEY\n~ MOD_KEY (changed)\n",
+		},
+		{
+			name: "show values",
+			result: &cmd.DiffResult{
+				Added:   []string{"NEW_KEY"},
+				Removed: []string{"OLD_KEY"},
+				Changed: map[string][2]string{"MOD_KEY": {"old", "new"}},
+			},
+			showValues: true,
+			want:       "+ NEW_KEY\n- OLD_KEY\n~ MOD_KEY: \"old\" → \"new\"\n",
 		},
 	}
 
@@ -108,7 +120,7 @@ func TestPrintDiff(t *testing.T) {
 			t.Parallel()
 
 			var buf bytes.Buffer
-			cmd.PrintDiff(&buf, tt.result)
+			cmd.PrintDiff(&buf, tt.result, tt.showValues)
 			if got := buf.String(); got != tt.want {
 				t.Errorf("got:\n%s\nwant:\n%s", got, tt.want)
 			}

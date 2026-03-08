@@ -107,6 +107,7 @@ func runDiff(args []string) {
 	fs := flag.NewFlagSet("diff", flag.ExitOnError)
 	secretID := fs.String("secret", "", "Secret ID (required)")
 	input := fs.String("input", ".env", "Input .env file path")
+	showValues := fs.Bool("show-values", false, "Show actual secret values in diff output")
 	region := fs.String("region", "", "AWS region (overrides default)")
 	profile := fs.String("profile", "", "AWS profile")
 	_ = fs.Parse(args)
@@ -126,7 +127,7 @@ func runDiff(args []string) {
 		fatal(err)
 	}
 
-	cmd.PrintDiff(os.Stdout, result)
+	cmd.PrintDiff(os.Stdout, result, *showValues)
 	if result.HasDiff() {
 		os.Exit(1)
 	}

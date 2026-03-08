@@ -79,7 +79,8 @@ func ComputeDiff(remote, local map[string]string) *DiffResult {
 }
 
 // PrintDiff writes a human-readable diff to the given writer.
-func PrintDiff(w io.Writer, r *DiffResult) {
+// When showValues is false, changed keys show "(changed)" instead of actual values.
+func PrintDiff(w io.Writer, r *DiffResult, showValues bool) {
 	if !r.HasDiff() {
 		fmt.Fprintln(w, "No differences.")
 		return
@@ -99,7 +100,11 @@ func PrintDiff(w io.Writer, r *DiffResult) {
 	slices.SortFunc(changedKeys, cmp.Compare)
 
 	for _, k := range changedKeys {
-		pair := r.Changed[k]
-		fmt.Fprintf(w, "~ %s: %q → %q\n", k, pair[0], pair[1])
+		if showValues {
+			pair := r.Changed[k]
+			fmt.Fprintf(w, "~ %s: %q → %q\n", k, pair[0], pair[1])
+		} else {
+			fmt.Fprintf(w, "~ %s (changed)\n", k)
+		}
 	}
 }
