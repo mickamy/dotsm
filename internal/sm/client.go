@@ -11,8 +11,17 @@ import (
 
 // API is the subset of the Secrets Manager client used by this package.
 type API interface {
-	GetSecretValue(ctx context.Context, params *secretsmanager.GetSecretValueInput, optFns ...func(*secretsmanager.Options)) (*secretsmanager.GetSecretValueOutput, error)
-	PutSecretValue(ctx context.Context, params *secretsmanager.PutSecretValueInput, optFns ...func(*secretsmanager.Options)) (*secretsmanager.PutSecretValueOutput, error)
+	GetSecretValue(
+		ctx context.Context,
+		params *secretsmanager.GetSecretValueInput,
+		optFns ...func(*secretsmanager.Options),
+	) (*secretsmanager.GetSecretValueOutput, error)
+
+	PutSecretValue(
+		ctx context.Context,
+		params *secretsmanager.PutSecretValueInput,
+		optFns ...func(*secretsmanager.Options),
+	) (*secretsmanager.PutSecretValueOutput, error)
 }
 
 // Client wraps the Secrets Manager API for dotenv-compatible operations.

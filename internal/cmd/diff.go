@@ -20,8 +20,8 @@ type DiffOptions struct {
 
 // DiffResult represents the result of comparing local and remote secrets.
 type DiffResult struct {
-	Added   []string          // keys in local but not in remote
-	Removed []string          // keys in remote but not in local
+	Added   []string             // keys in local but not in remote
+	Removed []string             // keys in remote but not in local
 	Changed map[string][2]string // key → [remote, local]
 }
 
@@ -36,7 +36,7 @@ func Diff(ctx context.Context, client *sm.Client, opts DiffOptions) (*DiffResult
 	if err != nil {
 		return nil, fmt.Errorf("open %q: %w", opts.Input, err)
 	}
-	defer f.Close()
+	defer func() { _ = f.Close() }()
 
 	local, err := dotenv.Parse(f)
 	if err != nil {
@@ -45,7 +45,7 @@ func Diff(ctx context.Context, client *sm.Client, opts DiffOptions) (*DiffResult
 
 	remote, err := client.Get(ctx, opts.SecretID)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("diff: %w", err)
 	}
 
 	return ComputeDiff(remote, local), nil

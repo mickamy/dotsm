@@ -22,7 +22,7 @@ func Push(ctx context.Context, client *sm.Client, opts PushOptions) error {
 	if err != nil {
 		return fmt.Errorf("open %q: %w", opts.Input, err)
 	}
-	defer f.Close()
+	defer func() { _ = f.Close() }()
 
 	kvs, err := dotenv.Parse(f)
 	if err != nil {
@@ -35,7 +35,7 @@ func Push(ctx context.Context, client *sm.Client, opts PushOptions) error {
 	}
 
 	if err := client.Put(ctx, opts.SecretID, kvs); err != nil {
-		return err
+		return fmt.Errorf("push: %w", err)
 	}
 
 	fmt.Fprintf(os.Stderr, "Pushed %d keys to %s\n", len(kvs), opts.SecretID)

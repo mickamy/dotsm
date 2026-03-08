@@ -1,10 +1,11 @@
 package cmd
 
 import (
-	"context"
 	"fmt"
 	"io"
 	"os"
+
+	"context"
 
 	"github.com/mickamy/dotsm/internal/dotenv"
 	"github.com/mickamy/dotsm/internal/sm"
@@ -20,7 +21,7 @@ type PullOptions struct {
 func Pull(ctx context.Context, client *sm.Client, opts PullOptions) error {
 	kvs, err := client.Get(ctx, opts.SecretID)
 	if err != nil {
-		return err
+		return fmt.Errorf("pull: %w", err)
 	}
 
 	var w io.Writer
@@ -31,7 +32,7 @@ func Pull(ctx context.Context, client *sm.Client, opts PullOptions) error {
 		if err != nil {
 			return fmt.Errorf("create %q: %w", opts.Output, err)
 		}
-		defer f.Close()
+		defer func() { _ = f.Close() }()
 		w = f
 	}
 

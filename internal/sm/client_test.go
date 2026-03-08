@@ -11,22 +11,43 @@ import (
 	"github.com/mickamy/dotsm/internal/sm"
 )
 
+type getFunc = func(
+	ctx context.Context,
+	params *secretsmanager.GetSecretValueInput,
+	optFns ...func(*secretsmanager.Options),
+) (*secretsmanager.GetSecretValueOutput, error)
+
+type putFunc = func(
+	ctx context.Context,
+	params *secretsmanager.PutSecretValueInput,
+	optFns ...func(*secretsmanager.Options),
+) (*secretsmanager.PutSecretValueOutput, error)
+
 type mockAPI struct {
-	getFunc func(ctx context.Context, params *secretsmanager.GetSecretValueInput, optFns ...func(*secretsmanager.Options)) (*secretsmanager.GetSecretValueOutput, error)
-	putFunc func(ctx context.Context, params *secretsmanager.PutSecretValueInput, optFns ...func(*secretsmanager.Options)) (*secretsmanager.PutSecretValueOutput, error)
+	getFunc getFunc
+	putFunc putFunc
 }
 
-func (m *mockAPI) GetSecretValue(ctx context.Context, params *secretsmanager.GetSecretValueInput, optFns ...func(*secretsmanager.Options)) (*secretsmanager.GetSecretValueOutput, error) {
+func (m *mockAPI) GetSecretValue(
+	ctx context.Context,
+	params *secretsmanager.GetSecretValueInput,
+	optFns ...func(*secretsmanager.Options),
+) (*secretsmanager.GetSecretValueOutput, error) {
 	return m.getFunc(ctx, params, optFns...)
 }
 
-func (m *mockAPI) PutSecretValue(ctx context.Context, params *secretsmanager.PutSecretValueInput, optFns ...func(*secretsmanager.Options)) (*secretsmanager.PutSecretValueOutput, error) {
+func (m *mockAPI) PutSecretValue(
+	ctx context.Context,
+	params *secretsmanager.PutSecretValueInput,
+	optFns ...func(*secretsmanager.Options),
+) (*secretsmanager.PutSecretValueOutput, error) {
 	return m.putFunc(ctx, params, optFns...)
 }
 
 func TestClient_Get(t *testing.T) {
 	t.Parallel()
 
+	//nolint:gosec // test data, not real credentials
 	tests := []struct {
 		name    string
 		secret  string
@@ -35,8 +56,8 @@ func TestClient_Get(t *testing.T) {
 	}{
 		{
 			name:   "valid JSON secret",
-			secret: `{"DB_HOST":"localhost","DB_PORT":"5432"}`,
-			want:   map[string]string{"DB_HOST": "localhost", "DB_PORT": "5432"},
+			secret: `{"HOST":"localhost","PORT":"5432"}`,
+			want:   map[string]string{"HOST": "localhost", "PORT": "5432"},
 		},
 		{
 			name:    "invalid JSON",
@@ -51,7 +72,11 @@ func TestClient_Get(t *testing.T) {
 			ctx := t.Context()
 
 			api := &mockAPI{
-				getFunc: func(_ context.Context, params *secretsmanager.GetSecretValueInput, _ ...func(*secretsmanager.Options)) (*secretsmanager.GetSecretValueOutput, error) {
+				getFunc: func(
+					_ context.Context,
+					params *secretsmanager.GetSecretValueInput,
+					_ ...func(*secretsmanager.Options),
+				) (*secretsmanager.GetSecretValueOutput, error) {
 					if got := *params.SecretId; got != "test/app" {
 						t.Errorf("secret ID: got %q, want %q", got, "test/app")
 					}
@@ -92,7 +117,11 @@ func TestClient_Get_NilSecretString(t *testing.T) {
 	ctx := t.Context()
 
 	api := &mockAPI{
-		getFunc: func(_ context.Context, _ *secretsmanager.GetSecretValueInput, _ ...func(*secretsmanager.Options)) (*secretsmanager.GetSecretValueOutput, error) {
+		getFunc: func(
+			_ context.Context,
+			_ *secretsmanager.GetSecretValueInput,
+			_ ...func(*secretsmanager.Options),
+		) (*secretsmanager.GetSecretValueOutput, error) {
 			return &secretsmanager.GetSecretValueOutput{SecretString: nil}, nil
 		},
 	}
@@ -112,7 +141,11 @@ func TestClient_Put(t *testing.T) {
 
 	var captured string
 	api := &mockAPI{
-		putFunc: func(_ context.Context, params *secretsmanager.PutSecretValueInput, _ ...func(*secretsmanager.Options)) (*secretsmanager.PutSecretValueOutput, error) {
+		putFunc: func(
+			_ context.Context,
+			params *secretsmanager.PutSecretValueInput,
+			_ ...func(*secretsmanager.Options),
+		) (*secretsmanager.PutSecretValueOutput, error) {
 			if got := *params.SecretId; got != "test/app" {
 				t.Errorf("secret ID: got %q, want %q", got, "test/app")
 			}
