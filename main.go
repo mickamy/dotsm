@@ -13,7 +13,7 @@ import (
 	"github.com/mickamy/dotsm/internal/sm"
 )
 
-const version = "dev"
+var version = "dev"
 
 const usage = `dotsm - Sync AWS Secrets Manager with .env files
 
